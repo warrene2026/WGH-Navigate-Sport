@@ -8,9 +8,17 @@ A parent-facing web app for accessing session reports and assigned resources.
 - **GitHub** (source control, connected to Vercel for auto-deploy on push)
 
 ## Status
-Core flow scaffolded: login (magic link) → consent gate → home (reports + resources).
-RLS policies are now in place — see `supabase/migrations/0002_rls.sql`. Run both
-migrations in order (0001 then 0002) before connecting any real client data.
+Core flow scaffolded: login (email + password) → consent gate → home (reports + resources).
+RLS policies are in place — see `supabase/migrations/0002_rls.sql`. Run both migrations
+in order (0001 then 0002) before connecting any real client data.
+
+Accounts are created by an administrator directly in Supabase — there is no
+self-service signup. To create a guardian:
+1. Supabase dashboard → **Authentication → Users → Add user**, set their email + a password.
+2. Supabase dashboard → **Table Editor → guardians → Insert row**, with `id` set to that
+   same user's UUID (copy it from the Users list), plus their `name` and `email`.
+3. Optionally link them to an athlete via the `athlete_guardians` table so `/home` has
+   data to show.
 
 ## Setup
 

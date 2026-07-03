@@ -55,6 +55,13 @@ body {
   color: var(--wgh-gray);
 }
 
+.auth-card .hint {
+  font-size: 0.75rem;
+  color: var(--wgh-gray);
+  text-align: center;
+  margin-top: 1rem;
+}
+
 .auth-card .form-error {
   font-size: 0.8rem;
   color: var(--wgh-red);

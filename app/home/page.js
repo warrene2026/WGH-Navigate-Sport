@@ -12,5 +12,14 @@ export default async function HomePage() {
 
   if (!user) redirect('/login');
 
+  const { data: existingConsent } = await supabase
+    .from('consents')
+    .select('id')
+    .eq('guardian_id', user.id)
+    .limit(1)
+    .maybeSingle();
+
+  if (!existingConsent) redirect('/consent');
+
   return <HomeClient userId={user.id} />;
 }
