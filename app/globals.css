@@ -55,6 +55,15 @@ body {
   color: var(--wgh-gray);
 }
 
+.auth-card .form-error {
+  font-size: 0.8rem;
+  color: var(--wgh-red);
+  background: rgba(209, 31, 38, 0.08);
+  border: 1px solid rgba(209, 31, 38, 0.3);
+  border-radius: 8px;
+  padding: 0.5rem 0.65rem;
+}
+
 .auth-card input {
   border: 1px solid var(--wgh-border);
   border-radius: 10px;

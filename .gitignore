@@ -9,3 +9,6 @@
 *.tsbuildinfo
 .vercel
 dev.bat
+
+.vercel
+.env*

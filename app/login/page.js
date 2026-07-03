@@ -6,13 +6,22 @@ export default function LoginPage() {
   const supabase = createClient();
   const [email, setEmail] = useState('');
   const [sent, setSent] = useState(false);
+  const [error, setError] = useState(null);
+  const [busy, setBusy] = useState(false);
 
   async function handleLogin(e) {
     e.preventDefault();
-    await supabase.auth.signInWithOtp({
+    setError(null);
+    setBusy(true);
+    const { error } = await supabase.auth.signInWithOtp({
       email,
       options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
     });
+    setBusy(false);
+    if (error) {
+      setError(error.message);
+      return;
+    }
     setSent(true);
   }
 
@@ -33,7 +42,10 @@ export default function LoginPage() {
               placeholder="you@example.com"
               required
             />
-            <button type="submit">Send login link</button>
+            {error && <p className="form-error">{error}</p>}
+            <button type="submit" disabled={busy}>
+              {busy ? 'Sending…' : 'Send login link'}
+            </button>
           </form>
         )}
       </div>
