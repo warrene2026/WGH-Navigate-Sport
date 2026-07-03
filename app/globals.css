@@ -62,7 +62,7 @@ body {
   margin-top: 1rem;
 }
 
-.auth-card .form-error {
+.form-error {
   font-size: 0.8rem;
   color: var(--wgh-red);
   background: rgba(209, 31, 38, 0.08);

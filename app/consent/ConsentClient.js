@@ -10,19 +10,29 @@ export default function ConsentClient({ userId }) {
   const [assent, setAssent] = useState(false);
   const [consent, setConsent] = useState(false);
   const [name, setName] = useState('');
+  const [error, setError] = useState(null);
+  const [busy, setBusy] = useState(false);
   const ready = assent && consent && name.trim().length > 1;
 
   async function handleSubmit() {
     if (!ready) return;
+    setError(null);
+    setBusy(true);
 
     // TODO: replace with the athlete this guardian is linked to,
     // and the current active consent_version id
-    await supabase.from('consents').insert({
+    const { error } = await supabase.from('consents').insert({
       guardian_id: userId,
       parental_consent: consent,
       athlete_assent_confirmed: assent,
       signed_name: name,
     });
+
+    setBusy(false);
+    if (error) {
+      setError(error.message);
+      return;
+    }
 
     router.push('/home');
   }
@@ -71,7 +81,11 @@ export default function ConsentClient({ userId }) {
         <label htmlFor="name">Full name (acts as your signature)</label>
         <input id="name" value={name} onChange={(e) => setName(e.target.value)} />
 
-        <button disabled={!ready} onClick={handleSubmit}>Confirm consent</button>
+        {error && <p className="form-error">{error}</p>}
+
+        <button disabled={!ready || busy} onClick={handleSubmit}>
+          {busy ? 'Submitting…' : 'Confirm consent'}
+        </button>
       </div>
     </main>
   );
