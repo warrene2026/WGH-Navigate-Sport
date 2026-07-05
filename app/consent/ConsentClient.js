@@ -1,91 +1,85 @@
 'use client';
-
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
+import { CONSENT_TEXT, CURRENT_CONSENT_VERSION } from '@/lib/consent';
+import { Logo } from '@/lib/ui/Logo';
 
 export default function ConsentClient({ userId }) {
   const supabase = createClient();
   const router = useRouter();
-  const [assent, setAssent] = useState(false);
-  const [consent, setConsent] = useState(false);
-  const [name, setName] = useState('');
+  const [checked, setChecked] = useState(false);
   const [error, setError] = useState(null);
   const [busy, setBusy] = useState(false);
-  const ready = assent && consent && name.trim().length > 1;
 
   async function handleSubmit() {
-    if (!ready) return;
+    if (!checked) return;
     setError(null);
     setBusy(true);
-
-    // TODO: replace with the athlete this guardian is linked to,
-    // and the current active consent_version id
     const { error } = await supabase.from('consents').insert({
-      guardian_id: userId,
-      parental_consent: consent,
-      athlete_assent_confirmed: assent,
-      signed_name: name,
+      user_id: userId,
+      version: CURRENT_CONSENT_VERSION,
     });
-
     setBusy(false);
     if (error) {
       setError(error.message);
       return;
     }
-
-    router.push('/home');
+    router.replace('/');
+    router.refresh();
   }
 
   return (
-    <main className="consent-page">
-      <div className="consent-card">
-        <h1>Before you continue</h1>
-        <p className="sub">
-          This confirms your consent for your child to take part in Navigate YS
-          sessions, in line with South Africa's data protection law (POPIA) and
-          our safeguarding policy.
-        </p>
+    <main className="min-h-screen px-4 py-8 flex justify-center bg-nys-bg">
+      <div className="w-full max-w-xl">
+        <div className="mb-6">
+          <Logo />
+        </div>
 
-        <section>
-          <h3>What we collect &amp; why</h3>
-          <p>Session notes, assessment scales, and a written report — collected only
-          to provide mental performance support to your child.</p>
-        </section>
+        <div className="bg-nys-card border border-nys-border rounded-xl p-6 flex flex-col gap-5">
+          <div>
+            <h1 className="text-lg font-medium text-white">{CONSENT_TEXT.title}</h1>
+            <p className="text-sm text-nys-dim mt-2">{CONSENT_TEXT.intro}</p>
+          </div>
 
-        <section>
-          <h3>What you see vs. what stays private</h3>
-          <p>You'll receive the written report after each session. Raw session
-          conversation stays private between your child and their practitioner.</p>
-        </section>
+          {CONSENT_TEXT.sections.map((s) => (
+            <div key={s.heading}>
+              <h3 className="text-sm font-medium text-white mb-1">{s.heading}</h3>
+              <p className="text-sm text-nys-dim">{s.body}</p>
+            </div>
+          ))}
 
-        <section className="flag">
-          <h3>Safeguarding — please read</h3>
-          <p>If anything in a session raises a safeguarding concern, we are legally
-          and ethically required to report it to the appropriate authorities. This
-          can override the privacy commitment above, and may happen without prior
-          notice to you.</p>
-        </section>
+          <div className="border border-[rgba(232,25,44,0.3)] bg-[rgba(232,25,44,0.08)] rounded-lg p-4">
+            <h3 className="text-sm font-medium text-nys-red mb-1">
+              {CONSENT_TEXT.safeguarding.heading}
+            </h3>
+            <p className="text-sm text-nys-dim">{CONSENT_TEXT.safeguarding.body}</p>
+          </div>
 
-        <label className="check-row">
-          <input type="checkbox" checked={assent} onChange={(e) => setAssent(e.target.checked)} />
-          I confirm my child has been told about these sessions in age-appropriate
-          language, and has agreed to take part.
-        </label>
+          <label className="flex items-start gap-2.5 text-sm text-white">
+            <input
+              type="checkbox"
+              checked={checked}
+              onChange={(e) => setChecked(e.target.checked)}
+              className="mt-0.5"
+            />
+            {CONSENT_TEXT.checkboxLabel}
+          </label>
 
-        <label className="check-row">
-          <input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} />
-          I am my child's parent/legal guardian, and I consent to the above.
-        </label>
+          {error && (
+            <p className="text-xs text-nys-red bg-[rgba(232,25,44,0.1)] border border-[rgba(232,25,44,0.3)] rounded-lg px-3 py-2">
+              {error}
+            </p>
+          )}
 
-        <label htmlFor="name">Full name (acts as your signature)</label>
-        <input id="name" value={name} onChange={(e) => setName(e.target.value)} />
-
-        {error && <p className="form-error">{error}</p>}
-
-        <button disabled={!ready || busy} onClick={handleSubmit}>
-          {busy ? 'Submitting…' : 'Confirm consent'}
-        </button>
+          <button
+            disabled={!checked || busy}
+            onClick={handleSubmit}
+            className="bg-nys-red text-white font-bold text-sm tracking-wide uppercase rounded-lg py-3 disabled:opacity-40"
+          >
+            {busy ? 'Saving…' : 'Accept & continue'}
+          </button>
+        </div>
       </div>
     </main>
   );

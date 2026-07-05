@@ -31,7 +31,8 @@ export async function middleware(request) {
   } = await supabase.auth.getUser();
 
   const path = request.nextUrl.pathname;
-  const isPublicRoute = path === '/login';
+  const isPublicRoute =
+    path === '/login' || path === '/forgot-password' || path === '/reset-password';
 
   if (!user && !isPublicRoute) {
     const url = request.nextUrl.clone();
@@ -39,9 +40,13 @@ export async function middleware(request) {
     return NextResponse.redirect(url);
   }
 
+  // Note: /reset-password is intentionally left accessible even when a
+  // (recovery) session exists — that's how the user actually sets their
+  // new password. Only /login redirects an already-authenticated user
+  // onward; '/' does the actual admin/consent/assessment/results routing.
   if (user && path === '/login') {
     const url = request.nextUrl.clone();
-    url.pathname = '/home';
+    url.pathname = '/';
     return NextResponse.redirect(url);
   }
 

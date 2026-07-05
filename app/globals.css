@@ -2,211 +2,28 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --wgh-red: #d11f26;
-  --wgh-maroon: #6e0a18;
-  --wgh-ink: #17110f;
-  --wgh-gray: #5a6472;
-  --wgh-border: #e2e5ea;
-  --wgh-bg: #edeff2;
-}
-
 body {
-  background: var(--wgh-bg);
-  color: var(--wgh-ink);
+  background: #1a1a1a;
+  color: #ffffff;
 }
 
-.brand {
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--wgh-red);
+input,
+textarea,
+select {
+  background: #2a2a2a;
+  border: 1px solid #3a3a3a;
+  color: #ffffff;
 }
 
-/* Login */
-.auth-page {
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(100deg, #530009, var(--wgh-maroon) 55%, var(--wgh-red));
-  padding: 1.5rem;
+input::placeholder,
+textarea::placeholder {
+  color: #8a8a86;
 }
 
-.auth-card {
-  width: 100%;
-  max-width: 380px;
-  background: #fff;
-  border-radius: 16px;
-  padding: 1.75rem;
-  box-shadow: 0 20px 50px rgba(20, 12, 10, 0.35);
-}
-
-.auth-card form {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-  margin-top: 1rem;
-}
-
-.auth-card label {
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: var(--wgh-gray);
-}
-
-.auth-card .hint {
-  font-size: 0.75rem;
-  color: var(--wgh-gray);
-  text-align: center;
-  margin-top: 1rem;
-}
-
-.form-error {
-  font-size: 0.8rem;
-  color: var(--wgh-red);
-  background: rgba(209, 31, 38, 0.08);
-  border: 1px solid rgba(209, 31, 38, 0.3);
-  border-radius: 8px;
-  padding: 0.5rem 0.65rem;
-}
-
-.auth-card input {
-  border: 1px solid var(--wgh-border);
-  border-radius: 10px;
-  padding: 0.6rem 0.75rem;
-  font-size: 0.9rem;
-  width: 100%;
-  margin-top: 0.25rem;
-}
-
-.auth-card button {
-  background: var(--wgh-red);
-  color: #fff;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  border-radius: 10px;
-  padding: 0.7rem 1rem;
-  margin-top: 0.25rem;
-}
-
-/* Consent */
-.consent-page {
-  min-height: 100vh;
-  padding: 2rem 1.5rem;
-  display: flex;
-  justify-content: center;
-}
-
-.consent-card {
-  width: 100%;
-  max-width: 560px;
-  background: #fff;
-  border-radius: 16px;
-  padding: 1.75rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.consent-card .sub {
-  color: var(--wgh-gray);
-  font-size: 0.9rem;
-}
-
-.consent-card section.flag {
-  background: rgba(209, 31, 38, 0.06);
-  border: 1px solid rgba(209, 31, 38, 0.25);
-  border-radius: 10px;
-  padding: 0.75rem 1rem;
-}
-
-.consent-card .check-row {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.6rem;
-  font-size: 0.9rem;
-}
-
-.consent-card input[type='text'],
-.consent-card input:not([type='checkbox']) {
-  border: 1px solid var(--wgh-border);
-  border-radius: 10px;
-  padding: 0.6rem 0.75rem;
-}
-
-.consent-card button {
-  background: var(--wgh-red);
-  color: #fff;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  border-radius: 10px;
-  padding: 0.75rem 1rem;
-}
-
-.consent-card button:disabled {
-  opacity: 0.5;
-}
-
-/* Home */
-.home-page {
-  min-height: 100vh;
-  padding: 1.5rem;
-  max-width: 720px;
-  margin: 0 auto;
-}
-
-.home-page header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 1.5rem;
-}
-
-.athlete-switcher {
-  display: flex;
-  gap: 0.5rem;
-}
-
-.athlete-switcher button {
-  border: 1px solid var(--wgh-border);
-  border-radius: 999px;
-  padding: 0.35rem 0.9rem;
-  font-size: 0.85rem;
-  background: #fff;
-}
-
-.athlete-switcher button.active {
-  background: var(--wgh-red);
-  color: #fff;
-  border-color: var(--wgh-red);
-}
-
-.home-page section {
-  margin-bottom: 1.5rem;
-}
-
-.home-page .empty {
-  color: var(--wgh-gray);
-  font-size: 0.9rem;
-}
-
-.report-card,
-.resource-card {
-  display: block;
-  background: #fff;
-  border: 1px solid var(--wgh-border);
-  border-radius: 10px;
-  padding: 0.85rem 1rem;
-  margin-bottom: 0.5rem;
-}
-
-.resource-card .type {
-  display: inline-block;
-  font-size: 0.7rem;
-  text-transform: uppercase;
-  color: var(--wgh-gray);
-  margin-right: 0.5rem;
+input:focus,
+textarea:focus,
+select:focus,
+button:focus-visible {
+  outline: 2px solid #e8192c;
+  outline-offset: 1px;
 }
