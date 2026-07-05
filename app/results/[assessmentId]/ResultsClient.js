@@ -86,7 +86,7 @@ export default function ResultsClient({ assessmentId, data, showEmailAction = tr
           <h1 className="text-xl font-medium text-white">{data.athleteName}</h1>
           <p className="text-sm text-nys-faint mt-0.5">
             {data.sport ? `${data.sport} · ` : ''}
-            {data.completedAt ? new Date(data.completedAt).toLocaleDateString() : ''}
+            {data.completedAt ? new Date(data.completedAt).toLocaleDateString('en-ZA') : ''}
           </p>
         </div>
 
