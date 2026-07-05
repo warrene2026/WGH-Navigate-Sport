@@ -1,15 +1,18 @@
 import Link from 'next/link';
-import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { Logo } from '@/lib/ui/Logo';
 
 export const dynamic = 'force-dynamic';
 
+// Gated by app/admin/layout.js's requireAdmin() check, so it's safe to
+// read across all users here via the service-role client — the normal
+// RLS-bound client would only ever return the caller's OWN row (that
+// was the bug: an earlier version used the normal client here, so the
+// roster always looked empty regardless of how many users existed).
 async function loadRoster() {
-  const supabase = await createClient();
   const admin = createAdminClient();
 
-  const { data: profiles } = await supabase
+  const { data: profiles } = await admin
     .from('profiles')
     .select('id, name, email, athlete_name, sport, created_at')
     .eq('role', 'user')
@@ -17,7 +20,7 @@ async function loadRoster() {
 
   const ids = (profiles ?? []).map((p) => p.id);
 
-  const { data: assessmentRows } = await supabase
+  const { data: assessmentRows } = await admin
     .from('assessments')
     .select('user_id, status, started_at')
     .in('user_id', ids.length ? ids : ['00000000-0000-0000-0000-000000000000'])

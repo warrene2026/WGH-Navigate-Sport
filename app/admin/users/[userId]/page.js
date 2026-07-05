@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { buildReportData } from '@/lib/assessment/reportData';
 import ResultsClient from '../../../results/[assessmentId]/ResultsClient';
 import { Logo } from '@/lib/ui/Logo';
@@ -10,17 +10,21 @@ export const dynamic = 'force-dynamic';
 // same buildReportData + ResultsClient as the self-service results
 // page (email action hidden — sending would email the admin's own
 // inbox, not the parent's, which would be confusing).
+//
+// Uses the service-role client throughout: this page reads another
+// user's profile/assessment/responses, which plain RLS ("own row
+// only") would otherwise block entirely.
 export default async function AdminUserResultsPage({ params }) {
   const { userId } = await params;
-  const supabase = await createClient();
+  const admin = createAdminClient();
 
-  const { data: profile } = await supabase
+  const { data: profile } = await admin
     .from('profiles')
     .select('name, athlete_name, sport, email')
     .eq('id', userId)
     .single();
 
-  const { data: assessment } = await supabase
+  const { data: assessment } = await admin
     .from('assessments')
     .select('*')
     .eq('user_id', userId)
@@ -44,7 +48,7 @@ export default async function AdminUserResultsPage({ params }) {
     );
   }
 
-  const { data: responses } = await supabase
+  const { data: responses } = await admin
     .from('responses')
     .select('question_key, answer_value')
     .eq('assessment_id', assessment.id);
