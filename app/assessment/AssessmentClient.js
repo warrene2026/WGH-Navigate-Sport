@@ -8,6 +8,7 @@ import { Logo } from '@/lib/ui/Logo';
 const DEBOUNCED_TYPES = new Set(['open_text']);
 
 function isAnswered(question, value) {
+  if (question.required === false) return true;
   if (
     question.type === 'multi_select_chips' ||
     question.type === 'checklist' ||

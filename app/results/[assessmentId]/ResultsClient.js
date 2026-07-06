@@ -8,19 +8,46 @@ const LEVEL_STYLES = {
   High: 'bg-[rgba(232,25,44,0.15)] text-nys-red',
 };
 
-function GaugeCard({ label, value }) {
+const RELATIONSHIP_STYLES = {
+  good: 'bg-[rgba(80,180,120,0.15)] text-[#6fcf97]',
+  watch: 'bg-[rgba(224,160,0,0.15)] text-[#e0a000]',
+};
+
+const RELATIONSHIP_LABELS = { good: 'Good', watch: 'Watch' };
+
+function ContextCard({ label, enjoyment, pressure }) {
   return (
     <div className="bg-nys-card border border-nys-border rounded-xl p-4 flex-1">
-      <p className="text-xs text-nys-faint uppercase tracking-wide">{label}</p>
-      <p className="text-2xl font-medium text-white mt-1">
-        {value ?? '—'}
-        <span className="text-sm text-nys-faint font-normal">/10</span>
-      </p>
-      <div className="h-1.5 rounded-full bg-nys-border mt-2 overflow-hidden">
+      <p className="text-xs text-nys-faint uppercase tracking-wide mb-2">{label}</p>
+      <p className="text-sm text-white mb-3">{enjoyment ?? '—'}</p>
+      <div className="h-1.5 rounded-full bg-nys-border overflow-hidden">
         <div
           className="h-full bg-nys-red rounded-full"
-          style={{ width: `${((value ?? 0) / 10) * 100}%` }}
+          style={{ width: `${((pressure ?? 0) / 5) * 100}%` }}
         />
+      </div>
+      <p className="text-xs text-nys-faint mt-1.5">
+        Pressure: {pressure ?? '—'}/5
+      </p>
+    </div>
+  );
+}
+
+function MomentList({ title, moments }) {
+  const answered = moments.filter((m) => m.level);
+  if (answered.length === 0) return null;
+  return (
+    <div>
+      <p className="text-xs text-nys-faint uppercase tracking-wide mb-2">{title}</p>
+      <div className="flex flex-col gap-2">
+        {answered.map((m) => (
+          <div key={m.key} className="flex items-center justify-between">
+            <span className="text-sm text-nys-dim">{m.label}</span>
+            <span className={`text-xs font-medium rounded-full px-2.5 py-1 ${LEVEL_STYLES[m.level]}`}>
+              {m.level}
+            </span>
+          </div>
+        ))}
       </div>
     </div>
   );
@@ -45,6 +72,13 @@ export default function ResultsClient({ assessmentId, data, showEmailAction = tr
 
   const totalIdentity = data.identity.sportRelatedCount + data.identity.nonSportRelatedCount;
   const sportRatio = totalIdentity > 0 ? data.identity.sportRelatedCount / totalIdentity : 0;
+
+  const hasFeelingDescription =
+    data.feelingDescription.whatItFeelsLike ||
+    data.feelingDescription.whatYourBrainDoes ||
+    data.feelingDescription.whatYouDoAboutIt;
+
+  const hasRelationshipMap = data.relationshipMap.some((r) => r.rating);
 
   return (
     <main className="min-h-screen px-4 py-8 flex justify-center bg-nys-bg">
@@ -95,28 +129,36 @@ export default function ResultsClient({ assessmentId, data, showEmailAction = tr
           <p className="text-sm text-white leading-relaxed">{data.keyInsight}</p>
         </div>
 
-        <div className="flex gap-3">
-          <GaugeCard label="Enjoyment" value={data.currentState.enjoyment} />
-          <GaugeCard label="Competition pressure" value={data.currentState.competitionPressure} />
-        </div>
-
-        <div className="bg-nys-card border border-nys-border rounded-xl p-5">
-          <p className="text-sm font-medium text-white mb-3">Pressure sources</p>
-          <div className="flex flex-col gap-2">
-            {data.pressureSources.map((s) => (
-              <div key={s.key} className="flex items-center justify-between">
-                <span className="text-sm text-nys-dim">{s.label}</span>
-                {s.level ? (
-                  <span className={`text-xs font-medium rounded-full px-2.5 py-1 ${LEVEL_STYLES[s.level]}`}>
-                    {s.level}
-                  </span>
-                ) : (
-                  <span className="text-xs text-nys-faint">—</span>
-                )}
-              </div>
-            ))}
+        <div>
+          <p className="text-sm font-medium text-white mb-3">Where they're at</p>
+          <div className="flex gap-3">
+            <ContextCard
+              label="Training"
+              enjoyment={data.currentState.enjoymentTraining}
+              pressure={data.currentState.pressureTraining}
+            />
+            <ContextCard
+              label="Competition"
+              enjoyment={data.currentState.enjoymentCompetition}
+              pressure={data.currentState.pressureCompetition}
+            />
           </div>
         </div>
+
+        {data.pressureSourceReflection && (
+          <div className="bg-nys-card border border-nys-border rounded-xl p-5">
+            <p className="text-xs text-nys-faint uppercase tracking-wide mb-1.5">Where the pressure comes from</p>
+            <p className="text-sm text-white">{data.pressureSourceReflection}</p>
+          </div>
+        )}
+
+        {(data.pressureMap.before.some((m) => m.level) || data.pressureMap.during.some((m) => m.level)) && (
+          <div className="bg-nys-card border border-nys-border rounded-xl p-5 flex flex-col gap-4">
+            <p className="text-sm font-medium text-white">Pressure map</p>
+            <MomentList title="Before" moments={data.pressureMap.before} />
+            <MomentList title="During" moments={data.pressureMap.during} />
+          </div>
+        )}
 
         {data.bodyLocations.length > 0 && (
           <div className="bg-nys-card border border-nys-border rounded-xl p-5">
@@ -131,21 +173,70 @@ export default function ResultsClient({ assessmentId, data, showEmailAction = tr
           </div>
         )}
 
+        {hasFeelingDescription && (
+          <div className="bg-nys-card border border-nys-border rounded-xl p-5 flex flex-col gap-3">
+            <p className="text-sm font-medium text-white">How it feels</p>
+            {data.feelingDescription.whatItFeelsLike && (
+              <div>
+                <p className="text-xs text-nys-faint uppercase tracking-wide mb-1">What it feels like</p>
+                <p className="text-sm text-nys-dim">{data.feelingDescription.whatItFeelsLike}</p>
+              </div>
+            )}
+            {data.feelingDescription.whatYourBrainDoes && (
+              <div>
+                <p className="text-xs text-nys-faint uppercase tracking-wide mb-1">What your brain does</p>
+                <p className="text-sm text-nys-dim">{data.feelingDescription.whatYourBrainDoes}</p>
+              </div>
+            )}
+            {data.feelingDescription.whatYouDoAboutIt && (
+              <div>
+                <p className="text-xs text-nys-faint uppercase tracking-wide mb-1">What they do about it</p>
+                <p className="text-sm text-nys-dim">{data.feelingDescription.whatYouDoAboutIt}</p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {hasRelationshipMap && (
+          <div className="bg-nys-card border border-nys-border rounded-xl p-5">
+            <p className="text-sm font-medium text-white mb-3">Relationship map</p>
+            <div className="flex flex-col gap-3">
+              {data.relationshipMap
+                .filter((r) => r.rating)
+                .map((r) => (
+                  <div key={r.key}>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-nys-dim">{r.label}</span>
+                      <span className={`text-xs font-medium rounded-full px-2.5 py-1 ${RELATIONSHIP_STYLES[r.rating]}`}>
+                        {RELATIONSHIP_LABELS[r.rating]}
+                      </span>
+                    </div>
+                    {r.note && <p className="text-xs text-nys-faint mt-1">{r.note}</p>}
+                  </div>
+                ))}
+            </div>
+          </div>
+        )}
+
         <div className="bg-nys-card border border-nys-border rounded-xl p-5">
-          <p className="text-sm font-medium text-white mb-3">Identity balance</p>
-          <div className="h-2 rounded-full bg-nys-border overflow-hidden flex mb-2">
-            <div className="h-full bg-nys-red" style={{ width: `${sportRatio * 100}%` }} />
-          </div>
-          <p className="text-xs text-nys-faint">
-            {data.identity.sportRelatedCount} sport-related, {data.identity.nonSportRelatedCount} non-sport
-          </p>
-          <div className="flex flex-wrap gap-2 mt-3">
-            {data.identity.words.map((word) => (
-              <span key={word} className="text-xs text-nys-dim border border-nys-border rounded-full px-3 py-1">
-                {word}
-              </span>
+          <p className="text-sm font-medium text-white mb-3">Identity reflection</p>
+          {totalIdentity > 0 && (
+            <>
+              <div className="h-2 rounded-full bg-nys-border overflow-hidden flex mb-2">
+                <div className="h-full bg-nys-red" style={{ width: `${sportRatio * 100}%` }} />
+              </div>
+              <p className="text-xs text-nys-faint mb-3">
+                {data.identity.sportRelatedCount} of {totalIdentity} sport-related
+              </p>
+            </>
+          )}
+          <ul className="flex flex-col gap-1.5">
+            {data.identity.sentences.map((s, i) => (
+              <li key={i} className="text-sm text-nys-dim">
+                "I am someone who… {s.text}"
+              </li>
             ))}
-          </div>
+          </ul>
         </div>
 
         {(data.perspectiveGap.othersSee || data.perspectiveGap.selfSee) && (

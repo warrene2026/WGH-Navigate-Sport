@@ -126,6 +126,32 @@ export function QuestionRenderer({ question, value, onChange }) {
         </div>
       );
 
+    case 'labeled_scale': {
+      const steps = question.steps ?? 5;
+      return (
+        <div className="flex flex-col gap-2">
+          <div className="flex gap-2">
+            {Array.from({ length: steps }, (_, i) => i + 1).map((n) => (
+              <button
+                key={n}
+                type="button"
+                onClick={() => onChange(n)}
+                className={`h-10 flex-1 rounded-lg text-sm font-medium border ${
+                  value === n ? CHIP_ON : CHIP_OFF
+                }`}
+              >
+                {n}
+              </button>
+            ))}
+          </div>
+          <div className="flex justify-between text-xs text-nys-faint">
+            <span>{question.lowLabel}</span>
+            <span>{question.highLabel}</span>
+          </div>
+        </div>
+      );
+    }
+
     case 'level_low_mod_high':
       return (
         <div className="flex gap-2">
