@@ -20,7 +20,7 @@ export default async function AdminUserResultsPage({ params }) {
 
   const { data: profile } = await admin
     .from('profiles')
-    .select('name, athlete_name, sport, email')
+    .select('name, athlete_name, sport, sport_type, email')
     .eq('id', userId)
     .single();
 

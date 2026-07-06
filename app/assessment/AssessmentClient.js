@@ -1,7 +1,7 @@
 'use client';
 import { useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { SECTIONS } from '@/lib/assessment/questions';
+import { getSections } from '@/lib/assessment/questions';
 import { QuestionRenderer } from './QuestionRenderer';
 import { Logo } from '@/lib/ui/Logo';
 
@@ -22,7 +22,7 @@ function isAnswered(question, value) {
   return value !== undefined && value !== null && value !== '';
 }
 
-export default function AssessmentClient({ assessmentId, initialAnswers, initialSectionIndex }) {
+export default function AssessmentClient({ assessmentId, sportType, initialAnswers, initialSectionIndex }) {
   const router = useRouter();
   const [answers, setAnswers] = useState(initialAnswers ?? {});
   const [sectionIndex, setSectionIndex] = useState(initialSectionIndex ?? 0);
@@ -33,6 +33,7 @@ export default function AssessmentClient({ assessmentId, initialAnswers, initial
   // this live; a state value would be a stale closure inside the loop.
   const pendingSavesRef = useRef(0);
 
+  const SECTIONS = getSections(sportType);
   const section = SECTIONS[sectionIndex];
   const isLastSection = sectionIndex === SECTIONS.length - 1;
 

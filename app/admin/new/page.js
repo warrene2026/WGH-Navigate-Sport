@@ -9,6 +9,7 @@ export default function NewUserPage() {
   const [email, setEmail] = useState('');
   const [athleteName, setAthleteName] = useState('');
   const [sport, setSport] = useState('');
+  const [sportType, setSportType] = useState('individual');
   const [error, setError] = useState(null);
   const [warning, setWarning] = useState(null);
   const [busy, setBusy] = useState(false);
@@ -21,7 +22,7 @@ export default function NewUserPage() {
     const res = await fetch('/api/admin/users', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, email, athleteName, sport }),
+      body: JSON.stringify({ name, email, athleteName, sport, sportType }),
     });
     const data = await res.json();
     setBusy(false);
@@ -86,6 +87,37 @@ export default function NewUserPage() {
             onChange={(e) => setSport(e.target.value)}
             className="rounded-lg px-3 py-2.5 text-sm w-full"
           />
+        </label>
+
+        <label className="flex flex-col gap-1.5">
+          <span className="text-xs font-medium text-nys-dim">Sport type</span>
+          <p className="text-xs text-nys-faint -mt-0.5">
+            Controls the wording of the assessment's Pressure Map questions.
+          </p>
+          <div className="flex gap-2 mt-1">
+            <button
+              type="button"
+              onClick={() => setSportType('individual')}
+              className={`flex-1 px-3 py-2.5 rounded-lg text-sm border ${
+                sportType === 'individual'
+                  ? 'bg-nys-red border-nys-red text-white'
+                  : 'bg-nys-bg border-nys-border text-nys-dim'
+              }`}
+            >
+              Individual / solo
+            </button>
+            <button
+              type="button"
+              onClick={() => setSportType('team')}
+              className={`flex-1 px-3 py-2.5 rounded-lg text-sm border ${
+                sportType === 'team'
+                  ? 'bg-nys-red border-nys-red text-white'
+                  : 'bg-nys-bg border-nys-border text-nys-dim'
+              }`}
+            >
+              Team
+            </button>
+          </div>
         </label>
 
         {error && (

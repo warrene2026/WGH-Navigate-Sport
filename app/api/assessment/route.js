@@ -52,7 +52,7 @@ export async function PATCH(request) {
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('name, athlete_name, sport')
+    .select('name, athlete_name, sport, sport_type')
     .eq('id', user.id)
     .single();
 
@@ -68,6 +68,7 @@ export async function PATCH(request) {
   const keyInsight = computeKeyInsight(answers, {
     name: profile?.athlete_name || profile?.name,
     sport: profile?.sport,
+    sportType: profile?.sport_type === 'team' ? 'team' : 'individual',
   });
 
   const { error } = await supabase

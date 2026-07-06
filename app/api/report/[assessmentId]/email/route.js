@@ -36,7 +36,7 @@ export async function POST(request, { params }) {
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('name, athlete_name, sport')
+    .select('name, athlete_name, sport, sport_type')
     .eq('id', user.id)
     .maybeSingle();
 

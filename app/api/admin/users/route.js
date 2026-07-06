@@ -8,7 +8,7 @@ export async function POST(request) {
     return NextResponse.json({ error: 'Not authorized.' }, { status: 403 });
   }
 
-  const { name, email, athleteName, sport } = await request.json();
+  const { name, email, athleteName, sport, sportType } = await request.json();
   if (!name || !email) {
     return NextResponse.json({ error: 'Name and email are required.' }, { status: 400 });
   }
@@ -33,6 +33,7 @@ export async function POST(request) {
     email,
     athlete_name: athleteName || null,
     sport: sport || null,
+    sport_type: sportType === 'team' ? 'team' : 'individual',
     role: 'user',
     status: 'active',
   });

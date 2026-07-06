@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { hasCurrentConsent } from '@/lib/consent';
-import { SECTIONS } from '@/lib/assessment/questions';
+import { getSections } from '@/lib/assessment/questions';
 import AssessmentClient from './AssessmentClient';
 
 export const dynamic = 'force-dynamic';
@@ -14,6 +14,14 @@ export default async function AssessmentPage() {
 
   if (!user) redirect('/login');
   if (!(await hasCurrentConsent(supabase, user.id))) redirect('/consent');
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('sport_type')
+    .eq('id', user.id)
+    .single();
+  const sportType = profile?.sport_type === 'team' ? 'team' : 'individual';
+  const sections = getSections(sportType);
 
   let { data: assessment } = await supabase
     .from('assessments')
@@ -49,9 +57,9 @@ export default async function AssessmentPage() {
   // if everything's answered but not yet submitted, land on the last
   // section so "Finish" is one click away.
   let initialSectionIndex = 0;
-  for (let i = 0; i < SECTIONS.length; i++) {
+  for (let i = 0; i < sections.length; i++) {
     initialSectionIndex = i;
-    const unanswered = SECTIONS[i].questions.some(
+    const unanswered = sections[i].questions.some(
       (q) => initialAnswers[q.key] === undefined
     );
     if (unanswered) break;
@@ -60,6 +68,7 @@ export default async function AssessmentPage() {
   return (
     <AssessmentClient
       assessmentId={assessment.id}
+      sportType={sportType}
       initialAnswers={initialAnswers}
       initialSectionIndex={initialSectionIndex}
     />
